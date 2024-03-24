@@ -1,37 +1,24 @@
-const path = require("path");
-const fsPromises = require('fs').promises
+const http = require("http");
+const PORT = 4000;
+const fs = require("fs");
 
-const fileops = async () => {
-   try {
-      const readData = await fsPromises.readFile(
-        path.join(__dirname, "sample", "demo.txt"),
-        "utf-8"
-      );
-      console.log(readData);
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/html" });
+  fs.readFile("index.html", (err,data) => {
+    if (err) {
+      res.writeHead(404);
+      res.write("page not found");
+    } else {
+      res.write(data);
+    }
+    res.end();
+  });
+});
 
-      await fsPromises.writeFile(path.join(__dirname, 'sample', 'sample2.txt'), 'hi, this is from file 2 sample');
-
-      await fsPromises.appendFile(path.join(__dirname, "sample", "sample2.txt"),"\n\n hi, this from 2nd append");
-
-      await fsPromises.rename(path.join(__dirname, "sample", "sample2.txt"),path.join(__dirname,"sample", "sample2Updated.txt"));
-
-      await fsPromises.unlink(path.join(__dirname,'sample','demo.txt'));
-      console.log('file deleted succesfully')
-      
-   } catch (error) {
-      console.error(error)
-   }
-}
-
-fileops()
-
-
-    
-
-
-
-
-process.on("uncaughtException", (err) => {
-  console.error(`user mentioned errr${err}`);
-  process.exit(1);
+server.listen(PORT, (err) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(`Server Running on ${PORT}`);
+  }
 });
